@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import SearchBar from './components/SearchBar'
+import VideosList from './components/VideosList'
+import VideoDetails from './components/VideoDetails'
+import youtube from './apis/youtube'
+import './components/styles/app.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+// Youtube Search Bar Access Token: AIzaSyCOVPtskHet2YsFwkZ5C0fE0fk70FNd3pI
+class App extends React.Component {
+    state = {
+        videos: [],
+        video: {},
+    }
+    onTermSubmit = async (term) => {
+        const res = await youtube.get('/search', {
+            params: { q: term },
+        })
+
+        this.setState({ videos: res.data.items })
+        this.setState({ videos: res.data.items })
+        this.setState({ video: res.data.items[0] })
+    }
+    onVideoClick = (video) => {
+        this.setState({ video })
+        console.log('VIDEO', video)
+    }
+
+    componentDidMount() {
+        this.onTermSubmit('React Js')
+    }
+    render() {
+        return (
+            <div className="  ui container">
+                <SearchBar setTerm={this.onTermSubmit} />
+                <div className="app">
+                    <div className="app-left">
+                        {' '}
+                        <VideoDetails video={this.state.video} />
+                    </div>{' '}
+                    <div className="app-right">
+                        {' '}
+                        <VideosList
+                            onVideoClick={this.onVideoClick}
+                            videos={this.state.videos}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
 }
-
-export default App;
+export default App
